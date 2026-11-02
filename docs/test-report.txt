@@ -1,0 +1,41 @@
+Testing against http://localhost:5001
+
+Cross-tenant isolation (Hyderabad user vs Bangalore data)
+PASS  Hyderabad user cannot list Bangalore boards (403)
+PASS  Guessing a Bangalore task id from Hyderabad returns 404
+PASS  Guessing a Bangalore board id from Hyderabad returns 404
+PASS  Cannot edit a Bangalore task from Hyderabad (404)
+PASS  Cannot move a Bangalore task from Hyderabad (404)
+PASS  Cannot delete a Bangalore task from Hyderabad (404)
+PASS  Cannot create a task in a Bangalore column from Hyderabad (404)
+PASS  Activity log only contains Hyderabad entries
+
+Cross-organization isolation
+PASS  ABC Org Admin cannot access XYZ branch Mumbai (403)
+PASS  XYZ user cannot access ABC branch Hyderabad (403)
+
+Authentication
+PASS  No token returns 401
+PASS  Garbage tenant header is rejected (403)
+PASS  WebSocket connection with an invalid token is rejected
+
+Role-based access control
+PASS  Member cannot create a board (403)
+PASS  Member cannot delete a task (403)
+PASS  Tenant Admin cannot create a tenant (403)
+PASS  Tenant Admin cannot assign a Tenant Admin (403)
+
+Concurrency
+PASS  Update with the current version succeeds (200)
+PASS  Update with a stale version is rejected (409)
+PASS  409 response includes the latest task state
+PASS  Two simultaneous moves with the same version: one wins, one gets 409
+
+WebSocket tenant rooms
+PASS  Hyderabad user cannot join the Bangalore room
+PASS  Users can join their own tenant rooms
+PASS  Presence lists both Hyderabad users
+PASS  Hyderabad colleague receives the live task event
+PASS  Bangalore user does NOT receive the Hyderabad event
+
+26 passed, 0 failed

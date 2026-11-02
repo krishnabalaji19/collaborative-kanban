@@ -1,0 +1,32 @@
+digraph ARCH {
+  graph [rankdir=TB, nodesep=0.6, ranksep=0.8, fontname="Helvetica", labelloc=t, fontsize=20,
+         label="Collaborative Kanban: system architecture"];
+  node  [shape=box, style="rounded,filled", fontname="Helvetica", fontsize=12, fillcolor="#ffffff", color="#475569"];
+  edge  [fontname="Helvetica", fontsize=10, color="#475569"];
+
+  subgraph cluster_fe {
+    label="Browser (React + Vite)"; style="rounded,filled"; fillcolor="#eef2ff"; color="#4f46e5"; fontname="Helvetica";
+    ui   [label="Login · Org selector · Branch switcher\nKanban board (dnd-kit) · Task panel · Activity"];
+    ctx  [label="AuthContext\n(user, org, tenant)"];
+    api  [label="api.js (axios)\nJWT + x-tenant-id headers"];
+    sock [label="socket.js (Socket.IO client)\nrejoin room + refetch on reconnect"];
+    ui -> ctx; ui -> api; ui -> sock;
+  }
+
+  subgraph cluster_be {
+    label="Node.js server (Express + Socket.IO)"; style="rounded,filled"; fillcolor="#ecfdf5"; color="#059669"; fontname="Helvetica";
+    mw   [label="Middleware chain\n1. requireAuth (verify JWT)\n2. requireTenant (verify membership)\n3. requireRole (RBAC)"];
+    ctl  [label="Controllers + Zod validation\nauth · organizations · tenants\nboards · columns · tasks · activity"];
+    svc  [label="Services\nactivity log · access checks"];
+    ws   [label="Socket.IO server\nJWT handshake · tenant:join check\nrooms tenant:<id> · presence"];
+    mw -> ctl -> svc;
+    ctl -> ws [label=" emit after commit", style=dashed];
+  }
+
+  db [label="PostgreSQL (Prisma)\nevery business table has tenant_id\ncomposite FKs · version column", shape=cylinder, fillcolor="#fef3c7", color="#b45309"];
+
+  api  -> mw   [label=" REST /api"];
+  sock -> ws   [label=" WebSocket"];
+  svc  -> db   [label=" transactions\n WHERE id AND tenant_id AND version"];
+  ws   -> sock [label=" task:* · board:updated\n presence:update", style=dashed, constraint=false];
+}

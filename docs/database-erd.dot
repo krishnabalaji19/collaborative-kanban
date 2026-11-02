@@ -1,0 +1,94 @@
+digraph ERD {
+  graph [rankdir=TB, nodesep=0.7, ranksep=0.9, fontname="Helvetica", labelloc=t, fontsize=20, label="Collaborative Kanban: database schema (PostgreSQL)\nYellow rows = tenant_id columns. Composite foreign keys stop a row from pointing at another tenant."];
+  node [shape=plain, fontname="Helvetica", fontsize=11];
+  edge [fontname="Helvetica", fontsize=9, color="#475569", dir=both, arrowtail=tee, arrowhead=crow];
+  organizations [label=<<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="4" COLOR="#4f46e5">
+<TR><TD COLSPAN="4" BGCOLOR="#4f46e5"><FONT COLOR="white" POINT-SIZE="14"><B>organizations</B></FONT></TD></TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#b91c1c"><B>PK</B></FONT></TD><TD ALIGN="LEFT">id</TD><TD ALIGN="LEFT"><FONT COLOR="#555555">uuid</FONT></TD><TD ALIGN="LEFT"></TD></TR>
+<TR><TD ALIGN="LEFT"></TD><TD ALIGN="LEFT">name</TD><TD ALIGN="LEFT"><FONT COLOR="#555555">varchar</FONT></TD><TD ALIGN="LEFT"></TD></TR>
+<TR><TD ALIGN="LEFT"></TD><TD ALIGN="LEFT">created_at</TD><TD ALIGN="LEFT"><FONT COLOR="#555555">timestamp</FONT></TD><TD ALIGN="LEFT"></TD></TR>
+<TR><TD ALIGN="LEFT"></TD><TD ALIGN="LEFT">updated_at</TD><TD ALIGN="LEFT"><FONT COLOR="#555555">timestamp</FONT></TD><TD ALIGN="LEFT"></TD></TR>
+</TABLE>>];
+  tenants [label=<<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="4" COLOR="#4f46e5">
+<TR><TD COLSPAN="4" BGCOLOR="#4f46e5"><FONT COLOR="white" POINT-SIZE="14"><B>tenants</B></FONT></TD></TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#b91c1c"><B>PK</B></FONT></TD><TD ALIGN="LEFT">id</TD><TD ALIGN="LEFT"><FONT COLOR="#555555">uuid</FONT></TD><TD ALIGN="LEFT"></TD></TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#1d4ed8"><B>FK</B></FONT></TD><TD ALIGN="LEFT">organization_id</TD><TD ALIGN="LEFT"><FONT COLOR="#555555">uuid</FONT></TD><TD ALIGN="LEFT"></TD></TR>
+<TR><TD ALIGN="LEFT"></TD><TD ALIGN="LEFT">name</TD><TD ALIGN="LEFT"><FONT COLOR="#555555">varchar</FONT></TD><TD ALIGN="LEFT"></TD></TR>
+<TR><TD ALIGN="LEFT"></TD><TD ALIGN="LEFT">created_at</TD><TD ALIGN="LEFT"><FONT COLOR="#555555">timestamp</FONT></TD><TD ALIGN="LEFT"></TD></TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#047857"><B>UQ</B></FONT></TD><TD ALIGN="LEFT">(id, organization_id)</TD><TD ALIGN="LEFT"><FONT COLOR="#555555">composite</FONT></TD><TD ALIGN="LEFT"></TD></TR>
+</TABLE>>];
+  users [label=<<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="4" COLOR="#4f46e5">
+<TR><TD COLSPAN="4" BGCOLOR="#4f46e5"><FONT COLOR="white" POINT-SIZE="14"><B>users</B></FONT></TD></TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#b91c1c"><B>PK</B></FONT></TD><TD ALIGN="LEFT">id</TD><TD ALIGN="LEFT"><FONT COLOR="#555555">uuid</FONT></TD><TD ALIGN="LEFT"></TD></TR>
+<TR><TD ALIGN="LEFT"></TD><TD ALIGN="LEFT">name</TD><TD ALIGN="LEFT"><FONT COLOR="#555555">varchar</FONT></TD><TD ALIGN="LEFT"></TD></TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#047857"><B>UQ</B></FONT></TD><TD ALIGN="LEFT">email</TD><TD ALIGN="LEFT"><FONT COLOR="#555555">varchar</FONT></TD><TD ALIGN="LEFT"></TD></TR>
+<TR><TD ALIGN="LEFT"></TD><TD ALIGN="LEFT">password_hash</TD><TD ALIGN="LEFT"><FONT COLOR="#555555">varchar</FONT></TD><TD ALIGN="LEFT"><FONT COLOR="#888888" POINT-SIZE="10">bcrypt</FONT></TD></TR>
+<TR><TD ALIGN="LEFT"></TD><TD ALIGN="LEFT">created_at</TD><TD ALIGN="LEFT"><FONT COLOR="#555555">timestamp</FONT></TD><TD ALIGN="LEFT"></TD></TR>
+</TABLE>>];
+  memberships [label=<<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="4" COLOR="#4f46e5">
+<TR><TD COLSPAN="4" BGCOLOR="#4f46e5"><FONT COLOR="white" POINT-SIZE="14"><B>memberships</B></FONT></TD></TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#b91c1c"><B>PK</B></FONT></TD><TD ALIGN="LEFT">id</TD><TD ALIGN="LEFT"><FONT COLOR="#555555">uuid</FONT></TD><TD ALIGN="LEFT"></TD></TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#1d4ed8"><B>FK</B></FONT></TD><TD ALIGN="LEFT">user_id</TD><TD ALIGN="LEFT"><FONT COLOR="#555555">uuid</FONT></TD><TD ALIGN="LEFT"></TD></TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#1d4ed8"><B>FK</B></FONT></TD><TD ALIGN="LEFT">organization_id</TD><TD ALIGN="LEFT"><FONT COLOR="#555555">uuid</FONT></TD><TD ALIGN="LEFT"></TD></TR>
+<TR><TD BGCOLOR="#fde68a" ALIGN="LEFT"><FONT COLOR="#1d4ed8"><B>FK</B></FONT></TD><TD BGCOLOR="#fde68a" ALIGN="LEFT">tenant_id</TD><TD BGCOLOR="#fde68a" ALIGN="LEFT"><FONT COLOR="#555555">uuid (nullable)</FONT></TD><TD BGCOLOR="#fde68a" ALIGN="LEFT"><FONT COLOR="#888888" POINT-SIZE="10">tenant scope</FONT></TD></TR>
+<TR><TD ALIGN="LEFT"></TD><TD ALIGN="LEFT">role</TD><TD ALIGN="LEFT"><FONT COLOR="#555555">enum</FONT></TD><TD ALIGN="LEFT"><FONT COLOR="#888888" POINT-SIZE="10">ORG_ADMIN / TENANT_ADMIN / MEMBER</FONT></TD></TR>
+<TR><TD ALIGN="LEFT"></TD><TD ALIGN="LEFT">created_at</TD><TD ALIGN="LEFT"><FONT COLOR="#555555">timestamp</FONT></TD><TD ALIGN="LEFT"></TD></TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#047857"><B>UQ</B></FONT></TD><TD ALIGN="LEFT">(user_id, organization_id, tenant_id)</TD><TD ALIGN="LEFT"><FONT COLOR="#555555">composite</FONT></TD><TD ALIGN="LEFT"></TD></TR>
+</TABLE>>];
+  boards [label=<<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="4" COLOR="#4f46e5">
+<TR><TD COLSPAN="4" BGCOLOR="#4f46e5"><FONT COLOR="white" POINT-SIZE="14"><B>boards</B></FONT></TD></TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#b91c1c"><B>PK</B></FONT></TD><TD ALIGN="LEFT">id</TD><TD ALIGN="LEFT"><FONT COLOR="#555555">uuid</FONT></TD><TD ALIGN="LEFT"></TD></TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#1d4ed8"><B>FK</B></FONT></TD><TD ALIGN="LEFT">organization_id</TD><TD ALIGN="LEFT"><FONT COLOR="#555555">uuid</FONT></TD><TD ALIGN="LEFT"></TD></TR>
+<TR><TD BGCOLOR="#fde68a" ALIGN="LEFT"><FONT COLOR="#1d4ed8"><B>FK</B></FONT></TD><TD BGCOLOR="#fde68a" ALIGN="LEFT">tenant_id</TD><TD BGCOLOR="#fde68a" ALIGN="LEFT"><FONT COLOR="#555555">uuid</FONT></TD><TD BGCOLOR="#fde68a" ALIGN="LEFT"><FONT COLOR="#888888" POINT-SIZE="10">tenant scope</FONT></TD></TR>
+<TR><TD ALIGN="LEFT"></TD><TD ALIGN="LEFT">name</TD><TD ALIGN="LEFT"><FONT COLOR="#555555">varchar</FONT></TD><TD ALIGN="LEFT"></TD></TR>
+<TR><TD ALIGN="LEFT"></TD><TD ALIGN="LEFT">description</TD><TD ALIGN="LEFT"><FONT COLOR="#555555">text</FONT></TD><TD ALIGN="LEFT"></TD></TR>
+<TR><TD ALIGN="LEFT"></TD><TD ALIGN="LEFT">created_by</TD><TD ALIGN="LEFT"><FONT COLOR="#555555">uuid</FONT></TD><TD ALIGN="LEFT"></TD></TR>
+<TR><TD ALIGN="LEFT"></TD><TD ALIGN="LEFT">created_at</TD><TD ALIGN="LEFT"><FONT COLOR="#555555">timestamp</FONT></TD><TD ALIGN="LEFT"></TD></TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#047857"><B>UQ</B></FONT></TD><TD ALIGN="LEFT">(id, tenant_id)</TD><TD ALIGN="LEFT"><FONT COLOR="#555555">composite</FONT></TD><TD ALIGN="LEFT"></TD></TR>
+</TABLE>>];
+  columns [label=<<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="4" COLOR="#4f46e5">
+<TR><TD COLSPAN="4" BGCOLOR="#4f46e5"><FONT COLOR="white" POINT-SIZE="14"><B>columns</B></FONT></TD></TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#b91c1c"><B>PK</B></FONT></TD><TD ALIGN="LEFT">id</TD><TD ALIGN="LEFT"><FONT COLOR="#555555">uuid</FONT></TD><TD ALIGN="LEFT"></TD></TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#1d4ed8"><B>FK</B></FONT></TD><TD ALIGN="LEFT">board_id</TD><TD ALIGN="LEFT"><FONT COLOR="#555555">uuid</FONT></TD><TD ALIGN="LEFT"></TD></TR>
+<TR><TD BGCOLOR="#fde68a" ALIGN="LEFT"><FONT COLOR="#1d4ed8"><B>FK</B></FONT></TD><TD BGCOLOR="#fde68a" ALIGN="LEFT">tenant_id</TD><TD BGCOLOR="#fde68a" ALIGN="LEFT"><FONT COLOR="#555555">uuid</FONT></TD><TD BGCOLOR="#fde68a" ALIGN="LEFT"><FONT COLOR="#888888" POINT-SIZE="10">tenant scope</FONT></TD></TR>
+<TR><TD ALIGN="LEFT"></TD><TD ALIGN="LEFT">name</TD><TD ALIGN="LEFT"><FONT COLOR="#555555">varchar</FONT></TD><TD ALIGN="LEFT"></TD></TR>
+<TR><TD ALIGN="LEFT"></TD><TD ALIGN="LEFT">position</TD><TD ALIGN="LEFT"><FONT COLOR="#555555">float</FONT></TD><TD ALIGN="LEFT"></TD></TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#047857"><B>UQ</B></FONT></TD><TD ALIGN="LEFT">(id, tenant_id)</TD><TD ALIGN="LEFT"><FONT COLOR="#555555">composite</FONT></TD><TD ALIGN="LEFT"></TD></TR>
+</TABLE>>];
+  tasks [label=<<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="4" COLOR="#4f46e5">
+<TR><TD COLSPAN="4" BGCOLOR="#4f46e5"><FONT COLOR="white" POINT-SIZE="14"><B>tasks</B></FONT></TD></TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#b91c1c"><B>PK</B></FONT></TD><TD ALIGN="LEFT">id</TD><TD ALIGN="LEFT"><FONT COLOR="#555555">uuid</FONT></TD><TD ALIGN="LEFT"></TD></TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#1d4ed8"><B>FK</B></FONT></TD><TD ALIGN="LEFT">board_id</TD><TD ALIGN="LEFT"><FONT COLOR="#555555">uuid</FONT></TD><TD ALIGN="LEFT"></TD></TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#1d4ed8"><B>FK</B></FONT></TD><TD ALIGN="LEFT">column_id</TD><TD ALIGN="LEFT"><FONT COLOR="#555555">uuid</FONT></TD><TD ALIGN="LEFT"></TD></TR>
+<TR><TD BGCOLOR="#fde68a" ALIGN="LEFT"><FONT COLOR="#1d4ed8"><B>FK</B></FONT></TD><TD BGCOLOR="#fde68a" ALIGN="LEFT">tenant_id</TD><TD BGCOLOR="#fde68a" ALIGN="LEFT"><FONT COLOR="#555555">uuid</FONT></TD><TD BGCOLOR="#fde68a" ALIGN="LEFT"><FONT COLOR="#888888" POINT-SIZE="10">tenant scope</FONT></TD></TR>
+<TR><TD ALIGN="LEFT"></TD><TD ALIGN="LEFT">title</TD><TD ALIGN="LEFT"><FONT COLOR="#555555">varchar</FONT></TD><TD ALIGN="LEFT"></TD></TR>
+<TR><TD ALIGN="LEFT"></TD><TD ALIGN="LEFT">description</TD><TD ALIGN="LEFT"><FONT COLOR="#555555">text</FONT></TD><TD ALIGN="LEFT"></TD></TR>
+<TR><TD ALIGN="LEFT"></TD><TD ALIGN="LEFT">priority</TD><TD ALIGN="LEFT"><FONT COLOR="#555555">varchar</FONT></TD><TD ALIGN="LEFT"></TD></TR>
+<TR><TD ALIGN="LEFT"></TD><TD ALIGN="LEFT">due_date</TD><TD ALIGN="LEFT"><FONT COLOR="#555555">timestamp</FONT></TD><TD ALIGN="LEFT"></TD></TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#1d4ed8"><B>FK</B></FONT></TD><TD ALIGN="LEFT">assigned_to</TD><TD ALIGN="LEFT"><FONT COLOR="#555555">uuid</FONT></TD><TD ALIGN="LEFT"></TD></TR>
+<TR><TD ALIGN="LEFT"></TD><TD ALIGN="LEFT">position</TD><TD ALIGN="LEFT"><FONT COLOR="#555555">float</FONT></TD><TD ALIGN="LEFT"><FONT COLOR="#888888" POINT-SIZE="10">fractional order</FONT></TD></TR>
+<TR><TD ALIGN="LEFT"></TD><TD ALIGN="LEFT">version</TD><TD ALIGN="LEFT"><FONT COLOR="#555555">int</FONT></TD><TD ALIGN="LEFT"><FONT COLOR="#888888" POINT-SIZE="10">optimistic lock</FONT></TD></TR>
+<TR><TD ALIGN="LEFT"></TD><TD ALIGN="LEFT">created_at / updated_at</TD><TD ALIGN="LEFT"><FONT COLOR="#555555">timestamp</FONT></TD><TD ALIGN="LEFT"></TD></TR>
+</TABLE>>];
+  activity_logs [label=<<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="4" COLOR="#4f46e5">
+<TR><TD COLSPAN="4" BGCOLOR="#4f46e5"><FONT COLOR="white" POINT-SIZE="14"><B>activity_logs</B></FONT></TD></TR>
+<TR><TD ALIGN="LEFT"><FONT COLOR="#b91c1c"><B>PK</B></FONT></TD><TD ALIGN="LEFT">id</TD><TD ALIGN="LEFT"><FONT COLOR="#555555">uuid</FONT></TD><TD ALIGN="LEFT"></TD></TR>
+<TR><TD BGCOLOR="#fde68a" ALIGN="LEFT"><FONT COLOR="#1d4ed8"><B>FK</B></FONT></TD><TD BGCOLOR="#fde68a" ALIGN="LEFT">tenant_id</TD><TD BGCOLOR="#fde68a" ALIGN="LEFT"><FONT COLOR="#555555">uuid</FONT></TD><TD BGCOLOR="#fde68a" ALIGN="LEFT"><FONT COLOR="#888888" POINT-SIZE="10">tenant scope</FONT></TD></TR>
+<TR><TD ALIGN="LEFT"></TD><TD ALIGN="LEFT">user_id</TD><TD ALIGN="LEFT"><FONT COLOR="#555555">uuid</FONT></TD><TD ALIGN="LEFT"></TD></TR>
+<TR><TD ALIGN="LEFT"></TD><TD ALIGN="LEFT">entity_type</TD><TD ALIGN="LEFT"><FONT COLOR="#555555">varchar</FONT></TD><TD ALIGN="LEFT"></TD></TR>
+<TR><TD ALIGN="LEFT"></TD><TD ALIGN="LEFT">entity_id</TD><TD ALIGN="LEFT"><FONT COLOR="#555555">uuid</FONT></TD><TD ALIGN="LEFT"></TD></TR>
+<TR><TD ALIGN="LEFT"></TD><TD ALIGN="LEFT">action</TD><TD ALIGN="LEFT"><FONT COLOR="#555555">varchar</FONT></TD><TD ALIGN="LEFT"></TD></TR>
+<TR><TD ALIGN="LEFT"></TD><TD ALIGN="LEFT">details</TD><TD ALIGN="LEFT"><FONT COLOR="#555555">jsonb</FONT></TD><TD ALIGN="LEFT"></TD></TR>
+<TR><TD ALIGN="LEFT"></TD><TD ALIGN="LEFT">created_at</TD><TD ALIGN="LEFT"><FONT COLOR="#555555">timestamp</FONT></TD><TD ALIGN="LEFT"></TD></TR>
+</TABLE>>];
+  organizations -> tenants [label=" organization_id" ];
+  organizations -> memberships [label=" organization_id" ];
+  users -> memberships [label=" user_id" ];
+  tenants -> memberships [label=" tenant_id (null = org-level)" style=dashed];
+  tenants -> boards [label=" (tenant_id, organization_id)" ];
+  boards -> columns [label=" (board_id, tenant_id)" ];
+  boards -> tasks [label=" (board_id, tenant_id)" ];
+  columns -> tasks [label=" (column_id, tenant_id)" ];
+  users -> tasks [label=" assigned_to" style=dashed];
+  tenants -> activity_logs [label=" tenant_id" ];
+}
