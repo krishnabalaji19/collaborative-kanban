@@ -232,10 +232,19 @@ Check the backend at `http://localhost:5001/api/health`.
 
 ### Screenshots
 
-|                                                  |                                                            |
-| ------------------------------------------------ | ---------------------------------------------------------- |
-| ![Login](screenshots/01-login.png)               | ![Board with two users](screenshots/02-board-realtime.png) |
-| ![Task details](screenshots/03-task-details.png) | ![Activity](screenshots/04-activity.png)                   |
+**Login**
+
+![Login](screenshots/01-login.png)
+
+**Real-time sync:** Priya (Tenant Admin) and Arjun (Member, in a private window) see the same board after a card is moved.
+
+| Priya                                             | Arjun                                             |
+| ------------------------------------------------- | ------------------------------------------------- |
+| ![Priya's board](screenshots/02-board-priya.webp) | ![Arjun's board](screenshots/03-board-arjun.webp) |
+
+| Task details                                     | Activity                                 |
+| ------------------------------------------------ | ---------------------------------------- |
+| ![Task details](screenshots/04-task-details.png) | ![Activity](screenshots/05-activity.png) |
 
 ## 10. API and WebSocket documentation
 
